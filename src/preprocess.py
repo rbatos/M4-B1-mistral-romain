@@ -15,9 +15,25 @@ import numpy as np
 import pandas as pd
 
 # TODO — Sélectionne tes features (exclure les fuites !)
-FEATURES: list[str] = [
-    'id', 'season', 'year', 'month', 'hour', 'is_holiday', 'weekday', 'is_working_day', 'weather', 'temperature_norm', 'temperature_feels_norm', 'humidity_norm', 'windspeed_norm', 'is_rush_hour'
+# 'id' enlevé car séquentielle et ne donne pas d'information intéressante pour le modèle
+FEATURES_NUMERICS: list[str] = [
+    'year',
+    'month',
+    'hour',
+    'is_holiday',
+    'weekday',
+    'is_working_day',
+    'weather',
+    'temperature_norm',
+    'temperature_feels_norm',
+    'humidity_norm',
+    'windspeed_norm',
+    'is_rush_hour'
 ]
+FEATURES_CATEGORICAL: list[str] = [
+    'season',  # saison encodée en ordinal (1-4)
+]
+FEATURES: list[str] = FEATURES_NUMERICS + FEATURES_CATEGORICAL
 TARGET: str = "total_rentals"
 
 
@@ -33,6 +49,7 @@ def load_dataset(path: Path) -> tuple[pd.DataFrame, pd.Series]:
     df = pd.read_csv(path)
 
     # Préparation des colonnes manquante ou a tranformer
+    # ici fait manuellement mais pd.get_dummies() peut être utilisé pour OrdinalEncoder season.
     # 1. Encodage manuel des saisons
     df["season"] = df["season"].map({"winter": 1, "spring": 2, "summer": 3, "fall": 4})
     # 2. Features d'interaction (heure × jour de semaine)

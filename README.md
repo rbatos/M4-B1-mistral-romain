@@ -1,159 +1,122 @@
-# M4-B1 — Squelette repo (benchmark Mistral Assurances)
+# M4-B1 — Benchmark Mistral Assurances (Romain)
 
-> **Repo template GitHub.** Clique sur **« Use this template »** → nomme-le
-> `M4-B1-mistral-<prénom>`.
-
----
-
-## 🚀 Démarrage (4 commandes)
-
-```bash
-git clone git@github.com:<ton-user>/M4-B1-mistral-<prenom>.git
-cd M4-B1-mistral-<prenom>
-
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-
-jupyter notebook notebooks/M4-B1_template.ipynb
-```
-
-> 📦 `bike_sharing.csv` est **déjà dans `data/`** (livré avec le template).
-> Le lien du **baseline `mistral-tarif-v1`** te sera donné mardi.
+Benchmark de modèles de régression sur `bike_sharing.csv` pour recommander un modèle de tarification/prévision robuste, lisible et industrialisable.
 
 ---
 
-## 🗺️ Ce que tu fais ce module (et ce qui est déjà cadré)
+## ✅ État d’avancement du projet
 
-Avant de coder, situe ton geste. **Choisir un modèle ≠ inventer la liste des
-modèles candidats.** Le sourcing des familles est déjà tranché ; ton travail
-(compétence **C4**) est **l'arbitrage chiffré et justifié entre ces candidats**.
-
-```mermaid
-flowchart TB
-    subgraph fait["🔒 Déjà cadré — tu ne choisis PAS ça"]
-        direction LR
-        A["Besoin métier<br/>Inès Tabet (Mistral Assurances)"]
-        B["Familles candidates imposées<br/>A · Linéaire (Ridge)<br/>B · RandomForest<br/>C · HistGradientBoosting"]
-        A --> B
-    end
-
-    subgraph toi["🎯 Ton travail M4-B1 — compétence C4"]
-        direction TB
-        C["EDA + split temporel propre<br/>(le MÊME pour tous)"]
-        D["Benchmark les 3 familles<br/>sur ce même split"]
-        E["Mesurer chaque candidat<br/>MAE · RMSE · R² + train + latence"]
-        F["Grille de décision C4<br/>volume · complexité · contraintes · maintenance"]
-        G[["Décision argumentée<br/>decision_card.md"]]
-        C --> D --> E --> F --> G
-    end
-
-    subgraph apres["⏭️ Plus tard (pas maintenant)"]
-        H["M5 déploiement"]
-        I["M6 réentraînement"]
-        J["M7 archi & menaces"]
-    end
-
-    B --> C
-    G --> H
-
-    style fait fill:#f0f0f0,stroke:#999,stroke-dasharray:5 5
-    style toi fill:#e8f4ff,stroke:#2b7bce
-    style apres fill:#f7f7f7,stroke:#bbb
-```
-
-**Pourquoi ces 3 familles (et pas d'autres) ?** Elles couvrent un **spectre de
-complexité croissante** adapté à un tabulaire de taille moyenne : baseline
-interprétable → ensemble robuste → boosting performant. Ni deep learning ni
-foundation model : ni le volume (~17 k lignes) ni la nature de la donnée ne le
-justifient (**sobriété**). Le détail famille par famille (forces / limites) est
-dans l'aide-mémoire `ressources-publiques/cheatsheet_algos_ML_FR.pdf` — les 3
-familles y sont repérées **« TRIO M4B1 »**. C'est le trajet que la map
-scikit-learn *« Choosing the right estimator »* recommande pour ce problème :
-le brief l'a fait pour toi ; en M8, tu le feras toi-même.
+- [x] Reprise baseline `mistral-tarif-v1` (référence R² ≈ 0.39)
+- [x] EDA saisonnalité (4 visualisations)
+- [x] Feature engineering métier :
+  - encodage `season` en ordinal
+  - création `is_rush_hour` (pics semaine matin/soir)
+- [x] Validation croisée temporelle avec `TimeSeriesSplit(n_splits=5)`
+- [x] Benchmark de 3 familles :
+  - Ridge (+ `StandardScaler` en pipeline)
+  - RandomForestRegressor
+  - HistGradientBoostingRegressor
+- [x] Sauvegarde des modèles en `.joblib` avec compression (`compress=3`)
+- [x] Génération de métadonnées `.json` (versions, timestamp, hash dataset, hyperparamètres, métriques, features)
 
 ---
 
-## 📁 Structure du repo
+## 📁 Structure actuelle
 
-```
-M4-B1-mistral-<prenom>/
+```text
+M4-B1-mistral-romain/
 ├── data/
-│   └── bike_sharing.csv                  # livré avec le template (versionné)
+│   └── bike_sharing.csv
 ├── notebooks/
-│   └── M4-B1_template.ipynb              # exploration + benchmark
+│   └── M4-B1_Romain.ipynb
 ├── src/
-│   ├── preprocess.py                     # TODO features + encodage
-│   ├── train_models.py                   # boucle benchmark mutualisée
-│   └── evaluate.py                       # métriques régression
-├── models/                               # gitignored — modèles .joblib
-├── ressources/                           # 📚 6 mini-cours
-│   ├── README.md
-│   ├── 01_EDA_saisonnalite_essentiel.md
-│   ├── 02_Split_temporel_vs_stratifie_essentiel.md
-│   ├── 03_Metriques_regression_essentiel.md
-│   ├── 04_Benchmark_methodologie_essentiel.md
-│   ├── 05_Grille_decision_C4_essentiel.md
-│   ├── 06_Menaces_robustesse_essentiel.md
-│   └── liens_officiels.md
-├── benchmark_table.md                    # livrable Inès
-├── decision_card.md                      # ta grille perso
-├── verdict.md                            # recommandation 5 lignes
+│   ├── preprocess.py
+│   ├── train_models.py
+│   └── evaluate.py
+├── models/                             # artefacts générés au benchmark
+│   ├── Ridge_(lineaire_+_scaling).joblib
+│   ├── RandomForestRegressor.joblib
+│   ├── HistGradientBoostingRegressor.joblib
+│   └── *.json                          # métadonnées par modèle
+├── benchmark_table.md
+├── decision_card.md
+├── verdict.md
 ├── requirements.txt
-├── .gitignore
-└── README.md (ce fichier — à compléter)
+└── README.md
 ```
 
 ---
 
-## 📚 Mini-cours d'appui
+## 🚀 Exécution (Windows / VS Code)
 
-6 mini-cours dans [`./ressources/`](./ressources/), lecture juste-à-temps.
+1. Créer et activer l’environnement :
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python.exe -m pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-| Tâche | Mini-cours |
-|---|---|
-| EDA orientée saisonnalité | [`01_EDA_saisonnalite_essentiel.md`](./ressources/01_EDA_saisonnalite_essentiel.md) |
-| Split temporel vs stratifié | [`02_Split_temporel_vs_stratifie_essentiel.md`](./ressources/02_Split_temporel_vs_stratifie_essentiel.md) |
-| Métriques régression (MAE/RMSE/R²) | [`03_Metriques_regression_essentiel.md`](./ressources/03_Metriques_regression_essentiel.md) |
-| Méthodologie benchmark | [`04_Benchmark_methodologie_essentiel.md`](./ressources/04_Benchmark_methodologie_essentiel.md) |
-| Grille de décision C4 | [`05_Grille_decision_C4_essentiel.md`](./ressources/05_Grille_decision_C4_essentiel.md) |
-| Robustesse et menaces (ouverture M7, non certifiant) | [`06_Menaces_robustesse_essentiel.md`](./ressources/06_Menaces_robustesse_essentiel.md) |
+2. Lancer Jupyter :
+```powershell
+jupyter notebook notebooks/M4-B1_Romain.ipynb
+```
 
----
-
-## 🧭 Démarche attendue
-
-### Mardi (5 h)
-
-1. Reprise baseline `mistral-tarif-v1` (30 min)
-2. EDA orientée saisonnalité (1h30) — mini-cours `01`
-3. Split argumenté + CV (30 min) — mini-cours `02`
-4. Benchmark 3+ familles (2h) — mini-cours `03` (métriques) + `04` (méthodo)
-5. Mur réflexif intermédiaire 16h45 (15 min)
-
-### Mercredi (2h + 1h15 restitution)
-
-6. Tableau comparatif (1h, 9h15-10h15) — mini-cours `04`
-7. Verdict + decision_card (30 min, 10h15-10h45) — mini-cours `05` (grille C4)
-8. Pause (15 min)
-9. Préparation restitution (30 min) — réflexion robustesse : mini-cours `06`
-10. **Construction collective grille de décision C4** (11h30-12h45) — mini-cours `05`
-
-→ Compétences visées : **C1 — adapter** + **C2 — adapter** + **C4 — imiter puis adapter**.
+> Si avertissement `loky` sous Windows : définir `LOKY_MAX_CPU_COUNT` dans la première cellule avant imports sklearn/joblib.
 
 ---
 
-## ✅ Conventions de code
+## 🧠 Méthodologie retenue
 
-- Python 3.11+
-- Type hints
-- Pas de `print`, `pathlib.Path`, `random_state=42`
+- **Split temporel** pour éviter fuite temporelle (`TimeSeriesSplit`).
+- **Comparaison équitable** : mêmes folds, mêmes métriques, mêmes règles d’évaluation.
+- **Métriques suivies** :
+  - MAE
+  - RMSE
+  - R²
+  - écart-type du R² (stabilité CV)
+  - temps d’entraînement
+  - latence d’inférence (ms/ligne)
 
 ---
 
-## 🆘 Bloqué·e ?
+## 🧪 Features utilisées
 
-1. Relis le mini-cours en cours.
-2. Si tu doutes entre `KFold` et `TimeSeriesSplit` → mini-cours 02.
-3. Si ton R² semble trop beau (> 0.99) → tu utilises **`casual_riders` ou
-   `registered_riders` en feature** — c'est une **fuite** ! Retire-les.
-4. Discord `fil-M4-B1`.
+- Numériques :  
+  `year`, `month`, `hour`, `is_holiday`, `weekday`, `is_working_day`, `weather`,  
+  `temperature_norm`, `temperature_feels_norm`, `humidity_norm`, `windspeed_norm`, `is_rush_hour`
+- Catégorielle encodée :  
+  `season` → `{winter:1, spring:2, summer:3, fall:4}`
+- Cible :  
+  `total_rentals`
+
+---
+
+## 📦 Artefacts produits
+
+Pour chaque modèle benchmarké :
+- `models/<nom_modele>.joblib` (compression `compress=3`)
+- `models/<nom_modele>.json` avec :
+  - versions (`python`, `scikit-learn`, `pandas`, `numpy`)
+  - timestamp
+  - hash dataset
+  - hyperparamètres
+  - métriques CV
+  - colonnes de features
+  - flag `selected_model`
+
+---
+
+## ⚠️ Points d’attention
+
+- Ne pas inclure `casual_riders` / `registered_riders` (fuite de cible).
+- Conserver le prétraitement dans les pipelines (anti-fuite CV).
+- Relancer le kernel après modification des imports/env vars.
+
+---
+
+## 📌 Livrables
+
+- `benchmark_table.md` : comparaison lisible métier
+- `verdict.md` : recommandation finale (5 lignes max)
+- `decision_card.md` : grille de décision C4 personnalisée

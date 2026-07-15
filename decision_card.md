@@ -51,7 +51,9 @@
 > suffit. Cf. mini-cours `06_Menaces_robustesse_essentiel.md`.
 
 - **Vulnérabilité identifiée** : risque hors-distribution (valeurs météo/usage hors plage d'entraînement) avec extrapolation silencieuse du modèle.
-- **Garde-fou envisagé** en conception : contrôle des bornes d'entrée + seuil d'abstention — *mitigation complète = M7, monitoring du drift = M6*.
+- **Garde-fou envisagé** en conception : contrôle des bornes d'entrée + seuil d'abstention :
+    - Avant `model.predict()` : contrôle de plages (hour ∈ [0,23], features normées ∈ [0,1], etc.) + alerte OOD (log + compteur)
+    - Dans `preprocess.py` : validation de schéma (colonnes attendues, types, valeurs manquantes)
 
 ## Ce que je veux apporter à la grille collective
 

@@ -17,8 +17,8 @@
 | Modèle | MAE | RMSE | R² | Std R² (CV) | Temps train (s) | Latence inférence (ms/ligne) | Explicabilité (1-3) | Mémoire (Mo) |
 |---|---|---|---|---|---|---|---|---|
 | **mistral-tarif-v1** (baseline) | 105.0 | 139.4 | 0.39 | n.d. | ~0.1 | ~0.0010 | 3 (très explicable) | 0.001 |
-| **HistGradientBoostingRegressor** | 51.89 | 76.17 | 0.796 | 0.124 | 0.745 | 0.0125 | 1 (faible) | 0.36 |
-| **RandomForestRegressor** | 53.78 | 81.03 | 0.772 | 0.129 | 4.983 | 0.1466 | 2 (moyenne) | 439.55 |
+| **HistGradientBoostingRegressor** | 51.89 | 76.17 | 0.796 | 0.124 | 0.745 | 0.0125 | 1 (faible) | 0.15 |
+| **RandomForestRegressor** | 53.78 | 81.03 | 0.772 | 0.129 | 4.983 | 0.1466 | 2 (moyenne) | 77.03 |
 | **Ridge (linéaire + scaling)** | 105.39 | 138.58 | 0.392 | 0.067 | 0.008 | 0.0013 | 3 (forte) | 0.002 |
 
 ## Interprétation pour Inès
